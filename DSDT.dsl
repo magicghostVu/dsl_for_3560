@@ -2227,12 +2227,11 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                             0x00000400,         // Address Length
                             )
                     })
-                    Method (_STA, 0, NotSerialized)  // _STA: Status
-                    {
-                        Return (0x0F)
-                    }
+                    
 
-                    Method (_CRS, 0, NotSerialized)  // _CRS: Current Resource Settings
+                    
+                    Name (_STA, 0x0F)
+                    Method (_CRS, 0, NotSerialized)
                     {
                         Return (BUF0)
                     }
@@ -2668,6 +2667,10 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
             {
                 Name (_ADR, Zero)  // _ADR: Address
             }
+            Device (IMEI)
+            {
+                Name (_ADR, 0x00160000)
+            }
         }
 
         Device (PNLF)
@@ -2735,7 +2738,8 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
 
     Method (_PTS, 1, NotSerialized)  // _PTS: Prepare To Sleep
     {
-        Store (Zero, P80D)
+        If (LNotEqual(Arg0,5)) {
+Store (Zero, P80D)
         P8XH (Zero, Arg0, Zero)
         Store (Arg0, SLPS)
         If (LEqual (Arg0, 0x03))
@@ -2826,6 +2830,8 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 Store (One, GP27)
             }
         }
+}
+
     }
 
     Method (_WAK, 1, Serialized)  // _WAK: Wake
@@ -2870,13 +2876,13 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
             \_SB.PCI0.XHC.XWAK ()
             If (IGDS)
             {
-                If (\_SB.PCI0.GFX0.SCIP ())
+                If (\_SB.PCI0.IGPU.SCIP ())
                 {
-                    If (LEqual (\_SB.PCI0.GFX0.CLID, Zero))
+                    If (LEqual (\_SB.PCI0.IGPU.CLID, Zero))
                     {
                         If (LEqual (GP15, One))
                         {
-                            \_SB.PCI0.GFX0.GLID (GP15)
+                            \_SB.PCI0.IGPU.GLID (GP15)
                         }
                     }
                 }
@@ -3638,42 +3644,42 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
     {
         If (LEqual (And (DID1, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD01, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD01, Arg0)
         }
 
         If (LEqual (And (DID2, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD02, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD02, Arg0)
         }
 
         If (LEqual (And (DID3, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD03, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD03, Arg0)
         }
 
         If (LEqual (And (DID4, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD04, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD04, Arg0)
         }
 
         If (LEqual (And (DID5, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD05, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD05, Arg0)
         }
 
         If (LEqual (And (DID6, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD06, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD06, Arg0)
         }
 
         If (LEqual (And (DID7, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD07, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD07, Arg0)
         }
 
         If (LEqual (And (DID8, 0x0F00), 0x0400))
         {
-            Notify (\_SB.PCI0.GFX0.DD08, Arg0)
+            Notify (\_SB.PCI0.IGPU.DD08, Arg0)
         }
     }
 
@@ -3804,9 +3810,9 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
 
         Method (_L06, 0, NotSerialized)  // _Lxx: Level-Triggered GPE
         {
-            If (LAnd (\_SB.PCI0.GFX0.GSSE, LNot (GSMI)))
+            If (LAnd (\_SB.PCI0.IGPU.GSSE, LNot (GSMI)))
             {
-                \_SB.PCI0.GFX0.GSCI ()
+                \_SB.PCI0.IGPU.GSCI ()
             }
         }
 
@@ -3828,9 +3834,9 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
 
             If (IGDS)
             {
-                If (\_SB.PCI0.GFX0.SCIP ())
+                If (\_SB.PCI0.IGPU.SCIP ())
                 {
-                    \_SB.PCI0.GFX0.GLID (GP15)
+                    \_SB.PCI0.IGPU.GLID (GP15)
                 }
                 Else
                 {
@@ -4232,25 +4238,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 }
             }
 
-            Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
-            {
-                If (DWOU)
-                {
-                    Return (Package (0x02)
-                    {
-                        0x0D, 
-                        0x03
-                    })
-                }
-                Else
-                {
-                    Return (Package (0x02)
-                    {
-                        0x0D, 
-                        Zero
-                    })
-                }
-            }
+            
 
             Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
             {
@@ -4612,55 +4600,24 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                     }
                 }
             }
-
-            Method (_DSM, 4, NotSerialized)  // _DSM: Device-Specific Method
+            
+            Name(_PRW, Package() { 0x0D, 0 })
+            Method (_DSM, 4, NotSerialized)
             {
-                If (LEqual (Arg2, Zero))
+                If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }
+                Return (Package()
                 {
-                    Return (Buffer (One)
-                    {
-                         0x03                                           
-                    })
-                }
-
-                Return (Package (0x12)
-                {
-                    "AAPL,clock-id", 
-                    Buffer (One)
-                    {
-                         0x01                                           
-                    }, 
-
-                    "built-in", 
-                    Buffer (One)
-                    {
-                         0x00                                           
-                    }, 
-
-                    "subsystem-id", 
-                    Buffer (0x04)
-                    {
-                         0x70, 0x72, 0x00, 0x00                         
-                    }, 
-
-                    "subsystem-vendor-id", 
-                    Buffer (0x04)
-                    {
-                         0x86, 0x80, 0x00, 0x00                         
-                    }, 
-
-                    "AAPL,current-available", 
-                    0x0834, 
-                    "AAPL,current-extra", 
-                    0x0898, 
-                    "AAPL,current-extra-in-sleep", 
-                    0x0640, 
-                    "AAPL,device-internal", 
-                    0x02, 
-                    "AAPL,max-port-current-in-sleep", 
-                    0x0834
+                    "subsystem-id", Buffer() { 0x70, 0x72, 0x00, 0x00 },
+                    "subsystem-vendor-id", Buffer() { 0x86, 0x80, 0x00, 0x00 },
+                    "AAPL,current-available", 2100,
+                    "AAPL,current-extra", 2200,
+                    "AAPL,current-extra-in-sleep", 1600,
+                    "AAPL,device-internal", 0x02,
+                    "AAPL,max-port-current-in-sleep", 2100,
                 })
             }
+
+            
         }
 
         Device (EHC2)
@@ -4909,55 +4866,24 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                     }
                 }
             }
-
-            Method (_DSM, 4, NotSerialized)  // _DSM: Device-Specific Method
+            
+            Name(_PRW, Package() { 0x0D, 0 })
+            Method (_DSM, 4, NotSerialized)
             {
-                If (LEqual (Arg2, Zero))
+                If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }
+                Return (Package()
                 {
-                    Return (Buffer (One)
-                    {
-                         0x03                                           
-                    })
-                }
-
-                Return (Package (0x12)
-                {
-                    "AAPL,clock-id", 
-                    Buffer (One)
-                    {
-                         0x01                                           
-                    }, 
-
-                    "built-in", 
-                    Buffer (One)
-                    {
-                         0x00                                           
-                    }, 
-
-                    "subsystem-id", 
-                    Buffer (0x04)
-                    {
-                         0x70, 0x72, 0x00, 0x00                         
-                    }, 
-
-                    "subsystem-vendor-id", 
-                    Buffer (0x04)
-                    {
-                         0x86, 0x80, 0x00, 0x00                         
-                    }, 
-
-                    "AAPL,current-available", 
-                    0x0834, 
-                    "AAPL,current-extra", 
-                    0x0898, 
-                    "AAPL,current-extra-in-sleep", 
-                    0x0640, 
-                    "AAPL,device-internal", 
-                    0x02, 
-                    "AAPL,max-port-current-in-sleep", 
-                    0x0834
+                    "subsystem-id", Buffer() { 0x70, 0x72, 0x00, 0x00 },
+                    "subsystem-vendor-id", Buffer() { 0x86, 0x80, 0x00, 0x00 },
+                    "AAPL,current-available", 2100,
+                    "AAPL,current-extra", 2200,
+                    "AAPL,current-extra-in-sleep", 1600,
+                    "AAPL,device-internal", 0x02,
+                    "AAPL,max-port-current-in-sleep", 2100,
                 })
             }
+
+            
         }
 
         Device (XHC)
@@ -5387,79 +5313,30 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 }
             }
 
-            Method (_PRW, 0, NotSerialized)  // _PRW: Power Resources for Wake
-            {
-                If (DWOU)
-                {
-                    Return (Package (0x02)
-                    {
-                        0x0D, 
-                        0x03
-                    })
-                }
-                Else
-                {
-                    Return (Package (0x02)
-                    {
-                        0x0D, 
-                        Zero
-                    })
-                }
-            }
+            
 
             Method (_PSW, 1, NotSerialized)  // _PSW: Power State Wake
             {
                 Store (Arg0, UFG1)
             }
-
-            Method (_DSM, 4, NotSerialized)  // _DSM: Device-Specific Method
+            
+            Name(_PRW, Package() { 0x0D, 0 })
+            Method (_DSM, 4, NotSerialized)
             {
-                If (LEqual (Arg2, Zero))
+                If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }
+                Return (Package()
                 {
-                    Return (Buffer (One)
-                    {
-                         0x03                                           
-                    })
-                }
-
-                Return (Package (0x12)
-                {
-                    "AAPL,clock-id", 
-                    Buffer (One)
-                    {
-                         0x02                                           
-                    }, 
-
-                    "built-in", 
-                    Buffer (One)
-                    {
-                         0x00                                           
-                    }, 
-
-                    "subsystem-id", 
-                    Buffer (0x04)
-                    {
-                         0x70, 0x72, 0x00, 0x00                         
-                    }, 
-
-                    "subsystem-vendor-id", 
-                    Buffer (0x04)
-                    {
-                         0x86, 0x80, 0x00, 0x00                         
-                    }, 
-
-                    "AAPL,current-available", 
-                    0x0834, 
-                    "AAPL,current-extra", 
-                    0x0898, 
-                    "AAPL,current-extra-in-sleep", 
-                    0x0640, 
-                    "AAPL,device-internal", 
-                    0x02, 
-                    "AAPL,max-port-current-in-sleep", 
-                    0x0834
+                    "subsystem-id", Buffer() { 0x70, 0x72, 0x00, 0x00 },
+                    "subsystem-vendor-id", Buffer() { 0x86, 0x80, 0x00, 0x00 },
+                    "AAPL,current-available", 2100,
+                    "AAPL,current-extra", 2200,
+                    "AAPL,current-extra-in-sleep", 1600,
+                    "AAPL,device-internal", 0x02,
+                    "AAPL,max-port-current-in-sleep", 2100,
                 })
             }
+
+            
         }
 
         Device (HDEF)
@@ -5512,6 +5389,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                     Buffer (Zero) {}
                 })
             }
+            Name(_PRW, Package() { 0x0D, 0 })
         }
 
         Device (RP01)
@@ -6452,17 +6330,23 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 Or (HCON, 0x02, HCON)
                 Or (HSTS, 0xFF, HSTS)
             }
-
             Device (BUS0)
             {
-                Name (_CID, "smbus")  // _CID: Compatible ID
-                Name (_ADR, Zero)  // _ADR: Address
+                Name (_CID, "smbus")
+                Name (_ADR, Zero)
                 Device (DVL0)
                 {
-                    Name (_ADR, 0x57)  // _ADR: Address
-                    Name (_CID, "diagsvault")  // _CID: Compatible ID
+                    Name (_ADR, 0x57)
+                    Name (_CID, "diagsvault")
+                    Method (_DSM, 4, NotSerialized)
+                    {
+                        If (LEqual (Arg2, Zero)) { Return (Buffer() { 0x03 } ) }
+                        Return (Package() { "address", 0x57 })
+                    }
                 }
             }
+
+            
         }
     }
 
@@ -7210,7 +7094,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
             Name (_ADR, 0x00040000)  // _ADR: Address
         }
 
-        Device (GFX0)
+        Device (IGPU)
         {
             Name (_ADR, 0x00020000)  // _ADR: Address
             Method (PCPC, 0, NotSerialized)
@@ -8637,7 +8521,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                     }
                     Else
                     {
-                        Notify (GFX0, Arg1)
+                        Notify (IGPU, Arg1)
                     }
                 }
 
@@ -8647,7 +8531,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 }
                 Else
                 {
-                    Notify (GFX0, 0x80)
+                    Notify (IGPU, 0x80)
                 }
 
                 Return (Zero)
@@ -8884,11 +8768,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
                 Return (GP15)
             }
 
-            Name (_PRW, Package (0x02)  // _PRW: Power Resources for Wake
-            {
-                0x1F, 
-                0x03
-            })
+            
             Method (_PSW, 1, NotSerialized)  // _PSW: Power State Wake
             {
                 Store (Arg0, SLID)
@@ -9856,7 +9736,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
         Method (_Q11, 0, NotSerialized)  // _Qxx: EC Query
         {
             Store (0x11, P80H)
-            Store (^^^GFX0.DD02._BQC (), Local1)
+            Store (^^^IGPU.DD02._BQC (), Local1)
             If (LNotEqual (Local1, Zero))
             {
                 Decrement (Local1)
@@ -9867,13 +9747,13 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
             Store (0xE005, ^^^^WMID.INF2)
             Store (Local1, ^^^^WMID.INF3)
             Notify (WMID, 0xD0)
-            Notify (^^^GFX0.DD02, 0x87)
+            Notify (^^^IGPU.DD02, 0x87)
         }
 
         Method (_Q12, 0, NotSerialized)  // _Qxx: EC Query
         {
             Store (0x12, P80H)
-            Store (^^^GFX0.DD02._BQC (), Local1)
+            Store (^^^IGPU.DD02._BQC (), Local1)
             If (LEqual (OSYS, 0x07DC))
             {
                 Store (0x64, Local2)
@@ -9893,7 +9773,7 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
             Store (0xE006, ^^^^WMID.INF2)
             Store (Local1, ^^^^WMID.INF3)
             Notify (WMID, 0xD0)
-            Notify (^^^GFX0.DD02, 0x86)
+            Notify (^^^IGPU.DD02, 0x86)
         }
 
         Method (_Q1D, 0, NotSerialized)  // _Qxx: EC Query
@@ -10231,12 +10111,12 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
         Method (_Q47, 0, NotSerialized)  // _Qxx: EC Query
         {
             Store (0x47, P80H)
-            Store (^^^GFX0.DD02._BQC (), Local0)
+            Store (^^^IGPU.DD02._BQC (), Local0)
             While (LGreaterEqual (Local0, One))
             {
                 Decrement (Local0)
                 Sleep (0x14)
-                Notify (^^^GFX0.DD02, 0x87)
+                Notify (^^^IGPU.DD02, 0x87)
             }
         }
 
@@ -10379,6 +10259,21 @@ DefinitionBlock ("", "DSDT", 1, "DELL  ", "CL09   ", 0x00000000)
     Device (RMKB)
     {
         Name (_HID, "RMKB0000")  // _HID: Hardware ID
+    }
+    Device (LIDP)
+    {
+        Name (_HID, "FAN00000")
+        Name (PLID, 0xFFFF)
+        // Poll for _LID status changes, notify if different
+        Method (FCPU, 0, Serialized)
+        {
+            Store(\_SB.LID0._LID(), Local0)
+            if (LNotEqual(Local0, PLID))
+            {
+                Store(Local0, PLID)
+                Notify(\_SB.LID0, 0x80)
+            }
+        }
     }
 }
 
