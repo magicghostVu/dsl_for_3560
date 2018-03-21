@@ -570,10 +570,48 @@
 	</dict>
 	<key>SMBIOS</key>
 	<dict>
-		<key>ProductName</key>
-		<string>MacBookPro9,2</string>
-		<key>Trust</key>
+		<key>BiosReleaseDate</key>
+		<string>02/02/2018</string>
+		<key>BiosVendor</key>
+		<string>Apple Inc.</string>
+		<key>BiosVersion</key>
+		<string>MBP102.88Z.010D.B00.1802021005</string>
+		<key>Board-ID</key>
+		<string>Mac-AFD8A9D944EA4843</string>
+		<key>BoardManufacturer</key>
+		<string>Apple Inc.</string>
+		<key>BoardSerialNumber</key>
+		<string>C02346404J9FF4LCB</string>
+		<key>BoardType</key>
+		<integer>10</integer>
+		<key>BoardVersion</key>
+		<string>1.0</string>
+		<key>ChassisAssetTag</key>
+		<string>MacBook-Aluminum</string>
+		<key>ChassisManufacturer</key>
+		<string>Apple Inc.</string>
+		<key>ChassisType</key>
+		<string>0x0A</string>
+		<key>Family</key>
+		<string>MacBook Pro</string>
+		<key>FirmwareFeatures</key>
+		<string>0xE00DE137</string>
+		<key>FirmwareFeaturesMask</key>
+		<string>0xFF1FFF3F</string>
+		<key>LocationInChassis</key>
+		<string>Part Component</string>
+		<key>Manufacturer</key>
+		<string>Apple Inc.</string>
+		<key>Mobile</key>
 		<true/>
+		<key>PlatformFeature</key>
+		<string>0xFFFF</string>
+		<key>ProductName</key>
+		<string>MacBookPro10,2</string>
+		<key>SerialNumber</key>
+		<string>C02LQXV8G4N7</string>
+		<key>Version</key>
+		<string>1.0</string>
 	</dict>
 	<key>SystemParameters</key>
 	<dict>
