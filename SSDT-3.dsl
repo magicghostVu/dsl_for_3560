@@ -249,6 +249,9 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
         Method (_INI, 0, NotSerialized)  // _INI: Initialize
         {
             Store (Zero, \_SB.PCI0.PEG0.PEGP._ADR)
+            //added to turn nvidia/radeon off
+            //External(\_SB.PCI0.PEG0.PEGP._OFF, MethodObj)
+            _OFF()
         }
 
         Method (_ON, 0, Serialized)  // _ON_: Power On
@@ -330,6 +333,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -376,7 +380,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
             Method (_BCM, 1, NotSerialized)  // _BCM: Brightness Control Method
             {
                 Return (\_SB.PCI0.GFX0.DD02._BCM)
-                Arg0
+                ////Arg0
             }
         }
 
@@ -389,6 +393,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -410,6 +415,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -431,6 +437,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -452,6 +459,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -473,6 +481,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -494,6 +503,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
 
             Method (_DCS, 0, NotSerialized)  // _DCS: Display Current Status
             {
+                Return (Zero)
             }
 
             Method (_DGS, 0, NotSerialized)  // _DGS: Display Graphics State
@@ -921,11 +931,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
         SKPD,   32
     }
 
-    Method (HGAS, 0, NotSerialized)
-    {
-        Store (One, \_SB.PCI0.PEG0.PEGP.PXGS)
-        Notify (\_SB.PCI0.GFX0, 0x81)
-    }
+    
 
     Method (HBRT, 1, Serialized)
     {
@@ -968,81 +974,7 @@ DefinitionBlock ("", "SSDT", 1, "COMPAL", "CRV ORB ", 0x00001000)
         }
     }
 
-    Method (HNOT, 1, Serialized)
-    {
-        Name (TMP0, Zero)
-        While (One)
-        {
-            Store (Arg0, TMP0)
-            If (LEqual (TMP0, One))
-            {
-                If (LNotEqual (\_SB.PCI0.PEG0.PEGP.GSTP, One))
-                {
-                    If (And (\_SB.PCI0.PEG0.PEGP.SGMD, 0x02))
-                    {
-                        If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, Zero))
-                        {
-                            Notify (\_SB.PCI0.GFX0, 0x80)
-                        }
-
-                        If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, One))
-                        {
-                            Notify (\_SB.PCI0.PEG0.PEGP, 0x80)
-                        }
-                    }
-                    Else
-                    {
-                        Store (TMP0, \_SB.PCI0.PEG0.PEGP.DSWR)
-                        Notify (\_SB.PCI0.GFX0, 0x81)
-                    }
-                }
-            }
-            ElseIf (LEqual (TMP0, 0x02))
-            {
-                If (And (\_SB.PCI0.PEG0.PEGP.SGMD, 0x02))
-                {
-                    If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, Zero))
-                    {
-                        Notify (\_SB.PCI0.GFX0, 0x80)
-                    }
-
-                    If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, One))
-                    {
-                        Notify (\_SB.PCI0.PEG0.PEGP, 0x80)
-                    }
-                }
-                Else
-                {
-                    Notify (\_SB.PCI0.GFX0, 0x80)
-                }
-            }
-            ElseIf (LEqual (TMP0, 0x03))
-            {
-                If (And (\_SB.PCI0.PEG0.PEGP.SGMD, 0x02))
-                {
-                    If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, Zero))
-                    {
-                        Notify (\_SB.PCI0.GFX0, 0x80)
-                    }
-
-                    If (LEqual (\_SB.PCI0.PEG0.PEGP.AGXA, One))
-                    {
-                        Notify (\_SB.PCI0.PEG0.PEGP, 0x80)
-                    }
-                }
-                Else
-                {
-                    Notify (\_SB.PCI0.GFX0, 0x80)
-                }
-            }
-            Else
-            {
-                Notify (\_SB.PCI0.GFX0, 0x80)
-            }
-
-            Break
-        }
-    }
+    
 
     Scope (\_SB.PCI0.GFX0)
     {
